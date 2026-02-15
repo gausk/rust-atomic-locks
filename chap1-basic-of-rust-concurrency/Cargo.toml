@@ -1,0 +1,6 @@
+[package]
+name = "chap1-basic-of-rust-concurrency"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]

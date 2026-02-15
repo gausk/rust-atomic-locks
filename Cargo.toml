@@ -1,0 +1,6 @@
+[workspace]
+resolver = "3"
+members = ["chap1-basic-of-rust-concurrency"]
+
+[workspace.dependencies]
+anyhow = "1.0.101"
