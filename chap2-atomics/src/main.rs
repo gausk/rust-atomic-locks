@@ -64,6 +64,8 @@ fn main() {
 }
 */
 
+/*
+
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::Relaxed;
 use std::thread;
@@ -95,5 +97,127 @@ fn main() {
         }
     });
 
+    println!("Done!");
+}
+
+#![feature(transparent_unions)]
+use std::mem::ManuallyDrop;
+
+#[repr(transparent)]
+pub union MaybeUnIninit<T> {
+    uninit: (),
+    value: ManuallyDrop<T>,
+}
+
+impl <T> MaybeUnIninit<T> {
+    pub const fn uninit() -> MaybeUnIninit<T> {
+        MaybeUnIninit { uninit: () }
+    }
+
+    pub const fn new(value: T) -> MaybeUnIninit<T> {
+        MaybeUnIninit { value: ManuallyDrop::new(value) }
+    }
+
+    pub fn zeroed() -> MaybeUnIninit<T> {
+        let mut u = Self::uninit();
+        // SAFETY: `u.as_mut_ptr()` points to allocated memory.
+        unsafe { u.as_mut_ptr().write_bytes(0u8, 1) }
+        u
+    }
+
+    pub fn as_mut_ptr(&mut self) -> *mut T {
+        // `MaybeUninit` and `ManuallyDrop` are both `repr(transparent)` so we can cast the pointer.
+        self as *mut _ as *mut T
+    }
+
+    pub const fn assume_init(self) -> T {
+        unsafe {
+            (&raw const self.value).cast::<T>().read()
+        }
+    }
+}
+
+use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering::Relaxed;
+use std::thread;
+use std::time::Duration;
+
+fn main() {
+    let num_done = &AtomicUsize::new(0);
+
+    thread::scope(|s| {
+        // Four background threads to process all 100 items, 25 each.
+        for t in 0..4 {
+            s.spawn(move || {
+                for i in 0..25 {
+                    thread::sleep(Duration::from_millis(100));
+                    //process_item(t * 25 + i); // Assuming this takes some time.
+                    num_done.fetch_add(1, Relaxed);
+                }
+            });
+        }
+
+        // The main thread shows status updates, every second.
+        loop {
+            let n = num_done.load(Relaxed);
+            if n == 100 {
+                break;
+            }
+            println!("Working.. {n}/100 done");
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
+
+    println!("Done!");
+}
+ */
+
+use std::sync::atomic::Ordering::Relaxed;
+use std::sync::atomic::{AtomicU64, AtomicUsize};
+use std::thread;
+use std::time::Duration;
+use std::time::Instant;
+
+fn main() {
+    let num_done = &AtomicUsize::new(0);
+    let total_time = &AtomicU64::new(0);
+    let max_time = &AtomicU64::new(0);
+
+    thread::scope(|s| {
+        // Four background threads to process all 100 items, 25 each.
+        for _t in 0..4 {
+            s.spawn(move || {
+                for _i in 0..25 {
+                    let start = Instant::now();
+                    //process_item(t * 25 + i); // Assuming this takes some time.
+                    std::thread::sleep(Duration::from_millis(120));
+                    let time_taken = start.elapsed().as_micros() as u64;
+                    num_done.fetch_add(1, Relaxed);
+                    total_time.fetch_add(time_taken, Relaxed);
+                    max_time.fetch_max(time_taken, Relaxed);
+                }
+            });
+        }
+
+        // The main thread shows status updates, every second.
+        loop {
+            let total_time = Duration::from_micros(total_time.load(Relaxed));
+            let max_time = Duration::from_micros(max_time.load(Relaxed));
+            let n = num_done.load(Relaxed);
+            if n == 100 {
+                break;
+            }
+            if n == 0 {
+                println!("Working.. nothing done yet.");
+            } else {
+                println!(
+                    "Working.. {n}/100 done, {:?} average, {:?} peak",
+                    total_time / n as u32,
+                    max_time,
+                );
+            }
+            thread::sleep(Duration::from_secs(1));
+        }
+    });
     println!("Done!");
 }

@@ -9,3 +9,7 @@ version = "0.1.0"
 [[package]]
 name = "chap2-atomics"
 version = "0.1.0"
+
+[[package]]
+name = "chap3-memory-ordering"
+version = "0.1.0"
