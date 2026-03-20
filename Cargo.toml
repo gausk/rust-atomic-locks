@@ -3,7 +3,9 @@ resolver = "3"
 members = [
     "chap1-basic-of-rust-concurrency",
     "chap2-atomics",
-    "chap3-memory-ordering"
+    "chap3-memory-ordering",
+    "chap4-building-our-own-spinlock",
+    "chap5-build-our-own-channel"
 ]
 
 [workspace.dependencies]

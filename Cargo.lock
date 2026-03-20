@@ -13,3 +13,11 @@ version = "0.1.0"
 [[package]]
 name = "chap3-memory-ordering"
 version = "0.1.0"
+
+[[package]]
+name = "chap4-building-our-own-spinlock"
+version = "0.1.0"
+
+[[package]]
+name = "chap5-build-our-own-channel"
+version = "0.1.0"
