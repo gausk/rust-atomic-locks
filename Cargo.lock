@@ -21,3 +21,11 @@ version = "0.1.0"
 [[package]]
 name = "chap5-build-our-own-channel"
 version = "0.1.0"
+
+[[package]]
+name = "chap6-building-our-own-arc"
+version = "0.1.0"
+
+[[package]]
+name = "chap7-understanding-the-processor"
+version = "0.1.0"

@@ -5,8 +5,9 @@ members = [
     "chap2-atomics",
     "chap3-memory-ordering",
     "chap4-building-our-own-spinlock",
-    "chap5-build-our-own-channel"
-]
+    "chap5-build-our-own-channel",
+    "chap6-building-our-own-arc"
+, "chap7-understanding-the-processor"]
 
 [workspace.dependencies]
 anyhow = "1.0.101"
