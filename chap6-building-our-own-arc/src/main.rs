@@ -1,7 +1,7 @@
-use std::ptr::NonNull;
-use std::sync::atomic::{fence, AtomicUsize, Ordering};
 use std::ops::Deref;
+use std::ptr::NonNull;
 use std::sync::atomic::Ordering::{Acquire, Relaxed};
+use std::sync::atomic::{AtomicUsize, Ordering, fence};
 
 struct ArcData<T> {
     data: T,
@@ -33,9 +33,7 @@ impl<T> Arc<T> {
         if self.data().ref_count.fetch_add(1, Relaxed) > usize::MAX / 2 {
             std::process::abort();
         }
-        Arc {
-            ptr: self.ptr,
-        }
+        Arc { ptr: self.ptr }
     }
 }
 
